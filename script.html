@@ -1,0 +1,424 @@
+<script>
+	$(document).ready(function() {
+    
+    $('.changeItem').change(function(){
+        $('#generate').click();
+    });
+
+    $(document).keypress(function (e) {
+        var key = e.which;
+         if(key == 13)  // the enter key code
+         {
+            $('#generate').click();
+             return false;  
+          }
+    });
+    
+    $('#video-button').hide();
+
+    var testing = false;
+    $('#generate').click(function(){
+        if(!testing){$("#answer").hide(); $("#show-answer").val("Show Answer");}
+        $('#plot').hide();
+
+        var type;
+        // handles the formatting for selecting any type
+        if($("#type").val()=="any"){type = random(1,4);}
+        else{type = parseInt($("#type").val())}
+
+        generate(parseInt(type));
+     });
+
+
+    $("#show-answer").click(function(){
+       if($("#answer").is(":hidden") ){
+          $("#answer").show();
+          $("#show-answer").val("Hide Answer");
+       } else{
+         $("#answer").hide();
+         $("#show-answer").val("Show Answer");
+        }
+    });
+    
+    if(testing){ $("#answer").show();}
+    
+	});
+	function generate(type){
+       
+       var videoLinks = ["https://www.youtube.com/watch?v=IX3PrLafBUI",
+                         "https://www.youtube.com/watch?v=_CmusOSd2ug",
+                         "https://www.youtube.com/watch?v=vbRn-QF0n9A",
+                         "https://www.youtube.com/watch?v=aKDG_J7ZT3E"];
+       
+       if(videoLinks[type-1].length != 0){ 
+         $("#videoLink"). attr("href", videoLinks[type-1]);
+         $('#video-button').show();
+       }
+       else{
+         $('#video-button').hide();
+       }
+       
+       var problem = "";
+       var answer = "";
+       var a,b,c,d,e,f,g,h,x1,x2,y1,y2,rate;
+       
+       // use a list of growth factors to choose from 
+       var possibleGrowthFactors = [2,2.5,3,4,5];
+       // Use the reciprocal for decay
+       var possibleDecayFactors = ["\\frac{1}{2}","\\frac{2}{5}","\\frac{1}{3}","\\frac{1}{4}","\\frac{1}{5}"]
+       var tableSize = random(6,8);
+       var yInt = non_zero_random(1,5);
+       var position = random(0,possibleGrowthFactors.length-1); // use this to grab the reciprocal for decay
+       var x1 = random(-2,2); 
+       
+       rate = possibleGrowthFactors[position];                      
+           
+        // produce the y values
+        var ys = [];
+        for(var i = 0; i < tableSize; i ++){             
+           ys.push(Math.round((yInt*Math.pow(rate,x1+i))*1000000)/1000000);
+        }           
+        var decay = false;
+       
+       $("#generated").html("");
+       $("#answer").html("");
+       
+       switch(type) {
+           
+           // Given table, find growth or decay factor
+           case 1:           
+           
+           // growth or decay
+           switch(random(0,1)){
+               
+               // keep it growth
+               case 0:
+               answer = "Growth factor = \\("+rate+"\\)";
+               break;
+               
+               // make it decay
+               case 1:
+               answer = "Decay factor = \\("+possibleDecayFactors[position]+"\\)";   
+               decay = true;
+               break;
+           }
+           
+           var xstring = ""; 
+           var ystring = "";
+           
+           problem = "Find the growth or decay factor of the exponential function below";
+           problem += "<table border='1'>";
+           problem += "<tr><td>\\(x\\)</td>";          
+          
+           for(var i = 0; i < tableSize; i++){
+              
+              xstring += "<td>"+(i+x1)+"</td>";
+              
+              if(decay){
+                ystring += "<td>"+ys[tableSize-i-1]+"</td>";
+              } 
+              
+              else{
+                ystring += "<td>"+ys[i]+"</td>";
+              }
+           
+           }
+           
+           problem += xstring+"</tr><tr><td>\\(y\\)</td>"+ystring+"</tr>";
+           problem += "</table>";
+           break;
+           
+           // Given table, find exponential equation
+           case 2:           
+           
+           // growth or decay
+           switch(random(0,1)){
+               
+               // keep it growth
+               case 0:
+               answer = "\\(y = "+yInt+"\\left("+rate+"\\right)^x\\)";
+               answer += "<br>Growth factor = \\("+rate+"\\), \\(y\\)-intercept = \\("+yInt+"\\)";
+               break;
+               
+               // make it decay
+               case 1:
+               yInt = Math.round((ys[ys.length-1]*Math.pow(rate,x1))*10000000)/10000000;
+               answer = "\\(y = "+yInt+"\\left("+possibleDecayFactors[position]+"\\right)^x\\)";
+               answer += "<br>Decay factor = \\("+possibleDecayFactors[position]+"\\), \\(y\\)-intercept = \\("+yInt+"\\)";
+               decay = true;
+               break;
+           }
+           
+           var xstring = ""; 
+           var ystring = "";
+           
+           problem = "Find the equation for the exponential function below";
+           problem += "<table border='1'>";
+           problem += "<tr><td>\\(x\\)</td>";          
+          
+           for(var i = 0; i < tableSize; i++){
+              
+              xstring += "<td>"+(i+x1)+"</td>";
+              
+              if(decay){
+                ystring += "<td>"+ys[tableSize-i-1]+"</td>";
+              } 
+              
+              else{
+                ystring += "<td>"+ys[i]+"</td>";
+              }
+           
+           }
+           
+           problem += xstring+"</tr><tr><td>\\(y\\)</td>"+ystring+"</tr>";
+           problem += "</table>";
+           break;
+           
+           // Given graph, find growth or decay factor
+           case 3:
+           var func = getExp();
+           var exp = func.b+"*("+func.n+"/"+func.d+")^x";
+           draw(exp);
+           $('#plot').show();
+           
+           if((func.n/func.d) > 1){
+              
+              answer = "Growth factor = ";
+              
+           } else{
+            
+              answer = "Decay factor = ";
+           
+           }
+           problem = "Find the growth or decay factor of the exponential function below";
+           answer += "\\("+simplifyFrac(func.n,func.d)+"\\)";
+           break;
+           
+           // Given graph, write equation
+           case 4:
+           var func = getExp();
+           var exp = func.b+"*("+func.n+"/"+func.d+")^x";
+           draw(exp);
+           $('#plot').show();  
+           problem = "Find the equation for the exponential function below";         
+           answer = "\\(y = "+func.b+"\\left("+simplifyFrac(func.n,func.d)+"\\right)^x\\)";
+           break;           
+           
+       }
+            
+       $("#generated").html(doublesigns(problem));
+       $("#answer").html(doublesigns(answer));
+       renderMathInElement(document.body);
+       
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
+	}
+    
+    // helper function for graphing to produce an exponential function with a viable y-intercept and growth/decay factor that'll fit in 10 by 10
+    function getExp(){
+       var found = false;
+       var num, den, yInt;
+       
+       do{
+           // generate values to be tested
+           yInt = non_zero_random(1,9); 
+           
+           do{
+             num = non_zero_random(1,5);
+             den = non_zero_random(1,5);
+           }
+           while(num == den); // don't want a growth factor of 1
+           
+           // test to see if values produce another coordinate in 10 by 10 
+           for(var i = -9; i < 9; i++){
+              
+              if(i != 0){ // need more than just the y-int
+              
+              var yVal = Math.pow(num/den,i)*yInt;
+              
+              if(yVal > -10 && yVal < 10 && Number.isInteger(yVal)){
+                 
+                 found = true;
+                 break;// break out of loop
+                 
+              }
+              
+              }
+            
+           }
+       }
+       while(!found);
+       
+       return {n:num, d:den, b:yInt};
+    }    
+    
+    // function that draws the graph between -10 and 10
+    function draw(expression) {
+    try {
+      // compile the expression once
+      var expr = math.compile(expression)
+
+      // evaluate the expression repeatedly for different values of x
+      var xValues = math.range(-10, 10, 0.1).toArray();
+      
+      // need to round these because of number types.  The values in the array weren't the exact decimals needed
+      for (var i = 0; i < xValues.length; i ++){         
+         xValues[i] = Math.round(xValues[i]*100)/100;         
+      }
+      
+      const yValues = xValues.map(function (x) {
+        return expr.eval({x: x});
+      })
+      
+      var xValues2 = [];
+      var yValues2 = []
+      for(var i = 0; i < xValues.length; i ++){         
+         var yvalue = expr.eval({x: xValues[i]});
+
+            // creates the "pretty points" to graph points at integer y-values
+            if(Number.isInteger(yvalue) && Number.isInteger(xValues[i])){        
+               xValues2.push(xValues[i]);
+               yValues2.push(yvalue);        
+            }          
+      }     
+      
+       
+      // render the line using plotly
+      var trace1 = {
+        x: xValues,
+        y: yValues,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };
+      
+      // render the "pretty points" using plotly
+      var trace2 = {
+        x: xValues2,
+        y: yValues2,
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: '#3F4591',
+          size: 8
+        },
+        hoverinfo:'none'
+      };
+      
+      var axis_template ={
+        showgrid: true,
+        zeroline: true,
+        nticks: 23,
+        range: [-11,11], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        showticklabels:false
+      };        
+      
+      // make grid smaller for mobile
+      var gridsize;
+      var indent;
+      // gridsize= Math.min(.95*window.innerWidth,550);
+      
+      if(window.innerWidth > 601){
+         gridsize = 550;
+         indent = 20;
+      }else{
+         gridsize = 350;
+         indent = 0;
+      }
+      
+      var xTickMarkLabels =   {
+        x: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        y: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"bottom",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };   
+      
+      var yTickMarkLabels =   {
+        y: [-10.1,-9.1,-8.1,-7.1,-6.1,-5.1,-4.1,-3.1,-2.1,-1.1,0,1,2,3,4,5,6,7,8,9,10],
+        x: [-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1],
+        mode: 'text',
+        text:[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+        textposition:"left",
+        textfont: {
+          size:13,
+        },
+        hoverinfo:'none'
+      };
+      
+      var layout = {
+        xaxis:axis_template,
+        yaxis:axis_template,
+        showlegend: false,
+        width: gridsize,
+        height: gridsize,
+        hovermode: 'closest',   
+        font:{size: 18},
+        margin: {l: indent,  r: 30, t: 20}
+      };
+      
+      layout.annotations= [
+      {
+         x: 0,
+         y: 11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: 35
+       },
+       {
+         x: 0,
+         y: -11,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 0,
+         ay: -35
+       },
+       {
+         x: 11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: -35,
+         ay: 0
+       },
+       {
+         x: -11,
+         y: 0,
+         showarrow: true,
+         arrowsize:2,
+         arrowwidth:1,
+         arrowhead:3,
+         ax: 35,
+         ay: 0
+       }
+
+     ];
+      
+      var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels];
+      Plotly.newPlot('plot', data, layout,{displayModeBar: false});
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
+</script>

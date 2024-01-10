@@ -48,7 +48,8 @@
        var videoLinks = ["https://www.youtube.com/watch?v=IX3PrLafBUI",
                          "https://www.youtube.com/watch?v=_CmusOSd2ug",
                          "https://www.youtube.com/watch?v=vbRn-QF0n9A",
-                         "https://www.youtube.com/watch?v=aKDG_J7ZT3E"];
+                         "https://www.youtube.com/watch?v=aKDG_J7ZT3E",
+                         ""];
        
        if(videoLinks[type-1].length != 0){ 
          $("#videoLink"). attr("href", videoLinks[type-1]);
@@ -204,16 +205,76 @@
            answer = "\\(y = "+func.b+"\\left("+simplifyFrac(func.n,func.d)+"\\right)^x\\)";
            break;           
            
+           // Rewrite exponential function
+           case 5:
+           var yInt = random(200,900,10);
+           var base = 1;
+           do{base = randomDec(0.3,5,1); }while (base == 1);
+           var varInput = pickVarCommon();
+           var varFunc = pickVarCommonFunc();
+           problem = "Rewrite into \\("+varFunc+"("+varInput+") = a(b)^"+varInput+"\\) form:<br>";
+           var functionNot = varFunc+"("+varInput+")";
+
+           switch(random(0,2)){
+
+               // product rule
+               case 0:
+               var power = random(2,5);
+               var bsqr = formatDec(Math.pow(base,power));
+               var newyInt = formatDec(bsqr*yInt);
+               problem += "\\("+functionNot+" = "+yInt+"("+base+")^{"+varInput+" + "+power+"}\\)";
+               answer = "\\("+functionNot+" = "+yInt+"("+base+")^{"+varInput+" + "+power+"} = "+yInt+"("+base+")^{"+varInput+"} \\cdot ("+base+")^{"+power+"}\\) <br> \\("+functionNot+"= "+newyInt+"("+base+")^{"+varInput+"}\\)";
+               break;
+               
+               // power rule
+               case 1:
+               var power = random(2,5);
+               var newBase = formatDec(Math.pow(base,power));
+               problem += "\\("+functionNot+" = "+yInt+"("+base+")^{"+power+""+varInput+"}\\)";
+               answer = "\\("+functionNot+" = "+yInt+"("+base+")^{"+power+""+varInput+"} = "+yInt+"("+base+"^{"+power+"})^{"+varInput+"} \\) <br> \\("+functionNot+"= "+yInt+"("+newBase+")^{"+varInput+"}\\)";
+               break;
+
+               // power rule and product rule
+               case 2:
+               var power = random(2,5);
+               var newBase = formatDec(Math.pow(base,power));
+               var power2 = random(2,5);
+               var bsqr = formatDec(Math.pow(base,power2));
+               var newyInt = formatDec(yInt*bsqr);
+               problem += "\\("+functionNot+" = "+yInt+"("+base+")^{"+power+""+varInput+" + "+power2+"}\\)";
+               answer = "\\("+functionNot+" = "+yInt+"("+base+")^{"+power+""+varInput+" + "+power2+"} = "+yInt+"("+base+")^{"+power+""+varInput+"} \\cdot ("+base+")^{"+power2+"} = "+yInt+"("+base+"^{"+power+"})^{"+varInput+"}\\cdot "+bsqr+"\\) <br> \\("+functionNot+"= "+newyInt+"("+newBase+")^{"+varInput+"}\\)";
+               break;
+               
+           }
+           break;
        }
             
        $("#generated").html(doublesigns(problem));
        $("#answer").html(doublesigns(answer));
        renderMathInElement(document.body);
        
-       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
-       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
 	}
     
+    function pickVarCommonFunc() {
+      var result           = '';
+      var characters       = 'abcdfghjk';
+      var charactersLength = characters.length;
+      return characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    
+    function pickVarCommon() {
+      var result           = '';
+      var characters       = 'xytn';
+      var charactersLength = characters.length;
+      return characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    
+    function randomDec(min, max, decimalPlaces) {  
+        var rand = Math.random()*(max-min) + min;
+        var power = Math.pow(10, decimalPlaces);
+        return Math.floor(rand*power) / power;
+    }
+
     // helper function for graphing to produce an exponential function with a viable y-intercept and growth/decay factor that'll fit in 10 by 10
     function getExp(){
        var found = false;

@@ -23,7 +23,7 @@
 
         var type;
         // handles the formatting for selecting any type
-        if($("#type").val()=="any"){type = random(1,5);}
+        if($("#type").val()=="any"){type = random(1,6);}
         else{type = parseInt($("#type").val())}
 
         generate(parseInt(type));
@@ -49,7 +49,8 @@
                          "https://www.youtube.com/watch?v=_CmusOSd2ug",
                          "https://www.youtube.com/watch?v=vbRn-QF0n9A",
                          "https://www.youtube.com/watch?v=aKDG_J7ZT3E",
-                         "https://www.youtube.com/watch?v=gQrT9AGqQfM"];
+                         "https://www.youtube.com/watch?v=gQrT9AGqQfM",
+                         ""];
        
        if(videoLinks[type-1].length != 0){ 
          $("#videoLink"). attr("href", videoLinks[type-1]);
@@ -246,6 +247,49 @@
                break;
                
            }
+           break;
+
+           // Percent change in equations
+           case 6:
+           
+           var initialVal = random(200,900,5);
+           var factor;
+           var incDec = "";
+           var varInput = pickVarCommon();
+           var varFunc = pickVarCommonFunc();
+
+           switch(random(0,1)){
+              // growth
+              case 0:
+              factor = randomDec(1.1,9,2);
+              incDec = "increase";
+              break;
+
+              // decay
+              case 1:
+              factor = randomDec(0.01,0.99,2);
+              incDec = "decrease";
+              break;
+           }
+
+           var perChange = formatDec(Math.abs(1-factor)*100);
+           var words = "The initial value is "+initialVal+" and there is a "+perChange+"% "+incDec+".";
+           var eq = "\\("+varFunc+"("+varInput+") = "+initialVal+"("+factor+")^{"+varInput+"}\\)";
+
+           switch(random(0,1)){
+              // given words
+              case 0:
+              problem = "Write the function in \\("+varFunc+"("+varInput+")\\) form:<br>"+words;
+              answer = eq;
+              break
+              // given equation
+              case 1:
+              problem = "Find the inital value and percent change: <br>"+eq;
+              answer = words;
+              break;
+
+           }
+
            break;
        }
             

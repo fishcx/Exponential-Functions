@@ -487,48 +487,51 @@
       };
       
       layout.annotations= [
+     {
+        x: 0,
+        y: 11,
+        showarrow: true,
+        arrowsize:2,
+        arrowwidth:1,
+        arrowhead:3,
+        arrowcolor:"#000000",
+        ax: 0,
+        ay: 35
+      },
       {
-         x: 0,
-         y: 11,
-         showarrow: true,
-         arrowsize:2,
-         arrowwidth:1,
-         arrowhead:3,
-         ax: 0,
-         ay: 35
-       },
-       {
-         x: 0,
-         y: -11,
-         showarrow: true,
-         arrowsize:2,
-         arrowwidth:1,
-         arrowhead:3,
-         ax: 0,
-         ay: -35
-       },
-       {
-         x: 11,
-         y: 0,
-         showarrow: true,
-         arrowsize:2,
-         arrowwidth:1,
-         arrowhead:3,
-         ax: -35,
-         ay: 0
-       },
-       {
-         x: -11,
-         y: 0,
-         showarrow: true,
-         arrowsize:2,
-         arrowwidth:1,
-         arrowhead:3,
-         ax: 35,
-         ay: 0
-       }
-
-     ];
+        x: 0,
+        y: -11,
+        showarrow: true,
+        arrowsize:2,
+        arrowwidth:1,
+        arrowhead:3,
+        arrowcolor:"#000000",
+        ax: 0,
+        ay: -35
+      },
+      {
+        x: 11,
+        y: 0,
+        showarrow: true,
+        arrowsize:2,
+        arrowwidth:1,
+        arrowhead:3,
+        arrowcolor:"#000000",
+        ax: -35,
+        ay: 0
+      },
+      {
+        x: -11,
+        y: 0,
+        showarrow: true,
+        arrowsize:2,
+        arrowwidth:1,
+        arrowhead:3,
+        arrowcolor:"#00000",
+        ax: 35,
+        ay: 0
+      }
+   ];
       
       var data = [trace1,trace2,xTickMarkLabels,yTickMarkLabels,axisMarkers];
       Plotly.newPlot('plot', data, layout,{displayModeBar: false});
